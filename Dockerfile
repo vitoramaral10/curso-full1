@@ -1,5 +1,7 @@
 FROM golang:latest as builder
 
+RUN apt-get update && apt-get install -y upx
+
 # Set the Current Working Directory inside the container
 WORKDIR /go/src/app
 
