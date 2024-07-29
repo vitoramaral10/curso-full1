@@ -1,7 +1,16 @@
 # Etapa de construção
 FROM golang:latest as builder
 
-RUN apt-get update && apt-get install -y upx
+# Instalar dependências
+RUN apt-get update && \
+    apt-get install -y wget && \
+    apt-get install -y xz-utils
+
+# Baixar e instalar o UPX manualmente
+RUN wget https://github.com/upx/upx/releases/download/v4.0.2/upx-4.0.2-amd64_linux.tar.xz && \
+    tar -xf upx-4.0.2-amd64_linux.tar.xz && \
+    mv upx-4.0.2-amd64_linux/upx /usr/local/bin/ && \
+    rm -rf upx-4.0.2-amd64_linux*
 
 # Definir o diretório de trabalho dentro do contêiner
 WORKDIR /go/src/app
@@ -15,14 +24,4 @@ RUN go build -ldflags "-s -w" -o main .
 # Comprimir o binário usando UPX
 RUN upx --best --lzma main
 
-# Iniciar uma nova etapa a partir do zero
-FROM busybox:musl
-
-# Definir o diretório de trabalho dentro do contêiner
-WORKDIR /root/
-
-# Copiar o binário pré-compilado da etapa anterior
-COPY --from=builder /go/src/app/main .
-
-# Comando para executar o binário
-CMD ["./main"]
+# Iniciar uma nova
