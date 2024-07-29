@@ -1,37 +1,16 @@
-# Etapa de construção
-FROM golang:latest as builder
+FROM python:latest as base
 
-# Instalar dependências
-RUN apt-get update && \
-    apt-get install -y wget && \
-    apt-get install -y xz-utils
+# Set the working directory 
+WORKDIR /app
 
-# Baixar e instalar o UPX manualmente
-RUN wget https://github.com/upx/upx/releases/download/v4.0.2/upx-4.0.2-amd64_linux.tar.xz && \
-    tar -xf upx-4.0.2-amd64_linux.tar.xz && \
-    mv upx-4.0.2-amd64_linux/upx /usr/local/bin/ && \
-    rm -rf upx-4.0.2-amd64_linux*
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Definir o diretório de trabalho dentro do contêiner
-WORKDIR /go/src/app
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar o código-fonte para o contêiner
-COPY . .
+# Make port 80 available to the world outside this container
+EXPOSE 8000
 
-# Compilar o aplicativo Go com otimizações
-RUN go build -ldflags "-s -w" -o main .
-
-# Comprimir o binário usando UPX
-RUN upx --best --lzma main
-
-# Iniciar uma nova etapa a partir do zero
-FROM busybox:musl
-
-# Definir o diretório de trabalho dentro do contêiner
-WORKDIR /root/
-
-# Copiar o binário pré-compilado da etapa anterior
-COPY --from=builder /go/src/app/main .
-
-# Comando para executar o binário
-CMD ["./main"]
+# Run app.py when the container launches
+CMD ["python", "main.py"]
