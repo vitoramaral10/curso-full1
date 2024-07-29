@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     image: gofullcycle
+    ports:
+      - 8000:8000
     deploy:
       mode: replicated
       replicas: 2
