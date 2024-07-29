@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
     image: gofullcycle
-    container_name: gofullcycle
     deploy:
       mode: replicated
       replicas: 2
