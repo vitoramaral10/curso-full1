@@ -3,4 +3,5 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      
+    image: gofullcycle
+    container_name: gofullcycle
