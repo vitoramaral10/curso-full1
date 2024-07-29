@@ -6,10 +6,10 @@ WORKDIR /go/src/app
 COPY . .
 
 # Build the Go app for
-RUN go build -o main .
+RUN go build -ldflags "-s -w" -o main .
 
 # Start a new stage from scratch
-FROM alpine:latest
+FROM busybox:musl
 
 WORKDIR /root/
 
